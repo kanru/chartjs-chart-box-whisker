@@ -229,10 +229,10 @@ module.exports = function (Chart) {
 	var DatasetScale = Chart.Scale.extend({
 
 		/**
-		* Internal function to get the correct labels. If data.xLabels or data.yLabels are defined, use those
-		* else fall back to data.labels
-		* @private
-		*/
+		 * Internal function to get the correct labels. If data.xLabels or data.yLabels are defined, use those
+		 * else fall back to data.labels
+		 * @private
+		 */
 		getLabels: function() {
 			var maxLength = 0;
 			helpers.each(this.chart.data.datasets, function(dataset, datasetIndex) {
@@ -275,8 +275,8 @@ module.exports = function (Chart) {
 				me.maxIndex = findIndex !== -1 ? findIndex : me.maxIndex;
 			}
 
-			me.min = moment(labels[me.minIndex]);
-			me.max = moment(labels[me.maxIndex]);
+			me.min = parseTime(me, labels[me.minIndex]);
+			me.max = parseTime(me, labels[me.maxIndex]);
 		},
 
 		buildTicks: function() {
@@ -286,13 +286,13 @@ module.exports = function (Chart) {
 			var labels = me.getLabels();
 			// If we are viewing some subset of labels, slice the original array
 			labels = (me.minIndex === 0 && me.maxIndex === labels.length - 1) ? labels : labels.slice(me.minIndex, me.maxIndex + 1);
-//			var minTimestamp = labels[0];
-//			var maxTimestamp = labels[labels.length - 1];
+			//			var minTimestamp = labels[0];
+			//			var maxTimestamp = labels[labels.length - 1];
 
 			var minTimestamp;
 			var maxTimestamp;
-//			var dataMin = me.dataMin;
-//			var dataMax = me.dataMax;
+			//			var dataMin = me.dataMin;
+			//			var dataMax = me.dataMax;
 			var dataMin = me.min;
 			var dataMax = me.max;
 
@@ -448,14 +448,14 @@ module.exports = function (Chart) {
 				}
 			}
 
-            var scale = me;
+			var scale = me;
 			var fullSize = scale.isHorizontal() ? scale.width : scale.height;
 			var categorySize = fullSize / me.chart.data.datasets[datasetIndex].data.length;
 			var base = scale.getPixelForValue(null, dataIndex, datasetIndex, false);
 			var center = base + (categorySize / 2);
 			return center;
 		},
-        // TODO(bmccann): this copied directly from scale.category.js
+		// TODO(bmccann): this copied directly from scale.category.js
 		getValueForPixel: function(pixel) {
 			var me = this;
 			var value;

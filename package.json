@@ -1,12 +1,12 @@
 {
-  "name": "chartjs-chart-financial",
-  "description": "Chart.js module for charting financial securities",
+  "name": "chartjs-chart-box-whisker",
+  "description": "Chart.js module for Box Whisker plot",
   "main": "src/index.js",
   "version": "0.1.0",
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/chartjs/chartjs-chart-financial.git"
+    "url": "https://github.com/kanru/chartjs-chart-box-whisker.git"
   },
   "dependencies": {
     "chart.js": "^2.6.0"

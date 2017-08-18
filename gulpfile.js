@@ -16,12 +16,13 @@ var srcFiles = srcDir + '**.js';
 var buildDir = './';
 
 var header = "/*!\n\
- * chartjs-chart-financial\n\
+ * chartjs-chart-box-whisker\n\
  * Version: {{ version }}\n\
  *\n\
+ * Copyright 2017 Kan-Ru Chen\n\
  * Copyright 2017 Ben McCann\n\
  * Released under the MIT license\n\
- * https://github.com/chartjs/chartjs-chart-financial/blob/master/LICENSE.md\n\
+ * https://github.com/kanru/chartjs-chart-box-whisker/blob/master/LICENSE.md\n\
  */\n";
 
 gulp.task('default', ['build', 'jshint', 'watch']);
@@ -34,12 +35,12 @@ function buildTask() {
   var nonBundled = browserify('./src/index.js')
     .ignore('chart.js')
     .bundle()
-    .pipe(source('Chart.Financial.js'))
+    .pipe(source('Chart.BoxWhisker.js'))
     .pipe(insert.prepend(header))
     .pipe(streamify(replace('{{ version }}', package.version)))
     .pipe(gulp.dest(buildDir))
     .pipe(streamify(uglify()))
-    .pipe(streamify(concat('Chart.Financial.min.js')))
+    .pipe(streamify(concat('Chart.BoxWhisker.min.js')))
     .pipe(gulp.dest(buildDir));
 
   return nonBundled;

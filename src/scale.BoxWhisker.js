@@ -11,7 +11,7 @@ module.exports = function(Chart) {
 		}
 	};
 
-	var FinancialLinearScale = Chart.scaleService.getScaleConstructor('linear').extend({
+	var BoxWhiskerLinearScale = Chart.scaleService.getScaleConstructor('linear').extend({
 
 		determineDataLimits: function() {
 			var me = this;
@@ -29,37 +29,37 @@ module.exports = function(Chart) {
 			me.max = null;
 
 			// Regular charts use x, y values
-			// For the financial chart we have rawValue.h (hi) and rawValue.l (low) for each point
+			// For the Box Whisker chart we have rawValue.max and rawValue.min for each point
 			helpers.each(datasets, function(dataset, datasetIndex) {
 				var meta = chart.getDatasetMeta(datasetIndex);
 				if (chart.isDatasetVisible(datasetIndex) && IDMatches(meta)) {			
 					helpers.each(dataset.data, function(rawValue, index) {
-						var high = rawValue.h;
-						var low = rawValue.l;
-			
+						var max = rawValue.max;
+						var min = rawValue.min;
+						
 						if (me.min === null) {
-							me.min = low;
-						} else if (low < me.min) {
-							me.min = low;
+							me.min = min;
+						} else if (min < me.min) {
+							me.min = min;
 						}
-		
+						
 						if (me.max === null) {
-							me.max = high;
-						} else if (high > me.max) {
-							me.max = high;
+							me.max = max;
+						} else if (max > me.max) {
+							me.max = max;
 						}
 					});
 				}
 			});
 
 			// Add whitespace around bars. Axis shouldn't go exactly from min to max
-            me.min = me.min - me.min * 0.05;
-            me.max = me.max + me.max * 0.05;
+			me.min = me.min - me.min * 0.05;
+			me.max = me.max + me.max * 0.05;
 
 			// Common base implementation to handle ticks.min, ticks.max, ticks.beginAtZero
 			this.handleTickRangeOptions();
 		}
 	});
-	Chart.scaleService.registerScaleType('financialLinear', FinancialLinearScale, defaultConfig);
+	Chart.scaleService.registerScaleType('BoxWhiskerLinear', BoxWhiskerLinearScale, defaultConfig);
 
 };

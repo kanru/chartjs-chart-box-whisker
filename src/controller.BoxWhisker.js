@@ -2,7 +2,7 @@
 
 module.exports = function(Chart) {
 
-	Chart.defaults.financial = {
+	Chart.defaults.BoxWhisker = {
 		label: '',
 
 		hover: {
@@ -21,27 +21,32 @@ module.exports = function(Chart) {
 				}
 			}],
 			yAxes: [{
-				type: 'financialLinear'
+				type: 'BoxWhiskerLinear'
 			}]
 		},
 
 		tooltips: {
 			callbacks: {
 				label: function(tooltipItem, data) {
-					var o = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].o;
-					var h = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].h;
-					var l = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].l;
-					var c = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].c;
+					var max = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].max;
+					var q3 = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].q3;
+					var med = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].med;
+					var q1 = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].q1;
+					var min = data.datasets[tooltipItem.datasetIndex].data[tooltipItem.index].min;
 
-					return ' O ' + o + ' H ' + h + ' L ' + l + ' C ' + c;
+					return ['Max: ' + max.toFixed(2),
+						'Q3:  ' + q3.toFixed(2),
+						'Med: ' + med.toFixed(2),
+						'Q1:  ' + q1.toFixed(2),
+						'Min: ' + min.toFixed(2)];
 				}
 			}
 		}
 	};
 
-	Chart.controllers.financial = Chart.DatasetController.extend({
+	Chart.controllers.BoxWhisker = Chart.DatasetController.extend({
 
-		dataElementType: Chart.elements.Candlestick,
+		dataElementType: Chart.elements.BoxWhisker,
 
 		initialize: function() {
 			var me = this;
@@ -66,32 +71,31 @@ module.exports = function(Chart) {
 			}
 		},
 
-		updateElement: function(candle, index, reset) {
+		updateElement: function(box, index, reset) {
 			var me = this;
 			var chart = me.chart;
 			var meta = me.getMeta();
 			var dataset = me.getDataset();
-			var custom = candle.custom || {};
+			var custom = box.custom || {};
 
-			candle._xScale = me.getScaleForId(meta.xAxisID);
-			candle._yScale = me.getScaleForId(meta.yAxisID);
-			candle._datasetIndex = me.index;
-			candle._index = index;
+			box._xScale = me.getScaleForId(meta.xAxisID);
+			box._yScale = me.getScaleForId(meta.yAxisID);
+			box._datasetIndex = me.index;
+			box._index = index;
 
-			candle._model = {
+			box._model = {
 				datasetLabel: dataset.label || '',
 				//label: '', // to get label value please use dataset.data[index].label
 
 				// Appearance
-				upCandleColor: dataset.upCandleColor,
-				downCandleColor: dataset.downCandleColor,
-				outlineCandleColor: dataset.outlineCandleColor,
-				outlineCandleWidth: dataset.outlineCandleWidth,
+				backgroundColor: dataset.backgroundColor,
+				outlineColor: dataset.outlineColor,
+				outlineWidth: dataset.outlineWidth
 			};
 
-			me.updateElementGeometry(candle, index, reset);
+			me.updateElementGeometry(box, index, reset);
 
-			candle.pivot();
+			box.pivot();
 		},
 
 		/**
@@ -105,15 +109,15 @@ module.exports = function(Chart) {
 			var horizontal = vscale.isHorizontal();
 			var ruler = me._ruler || me.getRuler();
 			var ipixels = me.calculateBarIndexPixels(me.index, index, ruler);
-			var candle = me.calculateCandleValuesPixels(me.index, index);
+			var box = me.calculateBoxValuesPixels(me.index, index);
 
 			model.horizontal = horizontal;
-			model.base = reset ? base : (candle.h + candle.l) / 2;
+			model.base = reset ? base : (box.q3 + box.q1) / 2;
 			model.x = ipixels.center;
-			model.y = reset ? base : (candle.h + candle.l) / 2;
+			model.y = reset ? base : (box.q3 + box.q1) / 2;
 			model.height = undefined;
 			model.width = ipixels.size;
-			model.candle = candle;
+			model.box = box;
 
 		},
 
@@ -209,7 +213,7 @@ module.exports = function(Chart) {
 			};
 		},
 
-		calculateCandleValuesPixels: function(datasetIndex, index) {
+		calculateBoxValuesPixels: function(datasetIndex, index) {
 
 			var me = this;
 			var chart = me.chart;
@@ -218,10 +222,11 @@ module.exports = function(Chart) {
 			var datasets = chart.data.datasets;
 
 			return {
-				o: scale.getPixelForValue(Number(datasets[datasetIndex].data[index].o)),
-				h: scale.getPixelForValue(Number(datasets[datasetIndex].data[index].h)),
-				l: scale.getPixelForValue(Number(datasets[datasetIndex].data[index].l)),
-				c: scale.getPixelForValue(Number(datasets[datasetIndex].data[index].c))
+				max: scale.getPixelForValue(Number(datasets[datasetIndex].data[index].max)),
+				q3: scale.getPixelForValue(Number(datasets[datasetIndex].data[index].q3)),
+				med: scale.getPixelForValue(Number(datasets[datasetIndex].data[index].med)),
+				q1: scale.getPixelForValue(Number(datasets[datasetIndex].data[index].q1)),
+				min: scale.getPixelForValue(Number(datasets[datasetIndex].data[index].min))
 			};
 		},
 
@@ -260,7 +265,7 @@ module.exports = function(Chart) {
 			Chart.canvasHelpers.clipArea(ctx, this.chart.chartArea);
 
 			for (; i < ilen; ++i) {
-				d = dataset.data[i].o;
+				d = dataset.data[i].q3;
 				if (d !== null && d !== undefined && !isNaN(d)) {
 					elements[i].draw();
 				}
@@ -275,7 +280,6 @@ module.exports = function(Chart) {
 
 		setHoverStyle: function(element) {
 			
-		},
-
+		}
 	});
 };
