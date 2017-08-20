@@ -34,6 +34,9 @@ module.exports = function(Chart) {
 				var meta = chart.getDatasetMeta(datasetIndex);
 				if (chart.isDatasetVisible(datasetIndex) && IDMatches(meta)) {			
 					helpers.each(dataset.data, function(rawValue, index) {
+						if (rawValue.dummy) {
+							return;
+						}
 						var max = rawValue.max;
 						var min = rawValue.min;
 						

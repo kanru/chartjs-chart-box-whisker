@@ -265,6 +265,9 @@ module.exports = function(Chart) {
 			Chart.canvasHelpers.clipArea(ctx, this.chart.chartArea);
 
 			for (; i < ilen; ++i) {
+				if (dataset.data[i].dummy) {
+					continue;
+				}
 				d = dataset.data[i].q3;
 				if (d !== null && d !== undefined && !isNaN(d)) {
 					elements[i].draw();
